@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls /c/Python*/python.exe /c/Users/Fion/AppData/Local/Programs/Python/*/python.exe)",
+      "Bash(where python.exe)",
+      "Read(//c/ProgramData/**)",
+      "Read(//c/Users/Fion/AppData/Local/Programs/**)",
+      "Read(//c/Program Files/**)",
+      "Read(//c/Users/Fion/.pyenv/pyenv-win/**)",
+      "Read(//c//**)",
+      "Bash(command -v conda)",
+      "Bash(curl -s http://localhost:5000/api/brand-voices)",
+      "Bash(curl -s http://localhost:5000/api/events)",
+      "Bash(curl -s -X POST http://localhost:5000/api/events -H \"Content-Type: application/json\" -d '{\"\"\"\"name\"\"\"\":\"\"\"\"Tech Summit 2026\"\"\"\",\"\"\"\"description\"\"\"\":\"\"\"\"Annual technology conference\"\"\"\",\"\"\"\"target_audience\"\"\"\":\"\"\"\"Software developers and CTOs\"\"\"\",\"\"\"\"theme\"\"\"\":\"\"\"\"AI and the Future of Work\"\"\"\",\"\"\"\"brand_voice_id\"\"\"\":1}')",
+      "Bash(python3 -c \"import sys,json;print\\(json.dumps\\(json.load\\(sys.stdin\\),indent=2\\)\\)\")",
+      "Bash(curl -s -X POST http://localhost:5000/api/events -H 'Content-Type: application/json' -d '{\"\"\"\"name\"\"\"\":\"\"\"\"Tech Summit 2026\"\"\"\",\"\"\"\"description\"\"\"\":\"\"\"\"Annual technology conference\"\"\"\",\"\"\"\"target_audience\"\"\"\":\"\"\"\"Software developers and CTOs\"\"\"\",\"\"\"\"theme\"\"\"\":\"\"\"\"AI and the Future of Work\"\"\"\",\"\"\"\"brand_voice_id\"\"\"\":1}')",
+      "Bash(curl -s -X POST http://localhost:5000/api/events/2/campaigns -H \"Content-Type: application/json\" -d '{\"\"name\"\":\"\"Pre-Event Buzz\"\",\"\"objective\"\":\"\"Build awareness and drive registrations\"\",\"\"phase\"\":\"\"pre-event\"\"}')",
+      "Bash(pkill -f \"py app.py\")",
+      "Bash(pkill -f \"python.*app.py\")",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(py -c \"import sys; print\\(sys.executable\\)\")",
+      "Bash(py -c \"import flask; print\\(flask.__file__\\)\")",
+      "Bash(\"/c/Program Files \\(x86\\)/Python310-32/python.exe\" -c \"import flask; print\\(''flask ok''\\)\")",
+      "Bash(py -m venv venv)",
+      "Bash(./venv/Scripts/python.exe -m pip install flask anthropic pdfplumber python-pptx openpyxl reportlab python-dotenv)",
+      "Bash(curl -s -X DELETE http://localhost:5000/api/events/1)",
+      "Bash(curl -s -X POST http://localhost:5000/api/ai/generate-ideas -H \"Content-Type: application/json\" -d '{\"\"event_id\"\":2,\"\"campaign_id\"\":1}')",
+      "Bash(ls \"P:/Program Files/Claude Code \\(Content Engine\\)/.claude/\")"
+    ]
+  }
+}

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Engine</title>
+    <link rel="stylesheet" href="/static/css/variables.css">
+    <link rel="stylesheet" href="/static/css/reset.css">
+    <link rel="stylesheet" href="/static/css/layout.css">
+    <link rel="stylesheet" href="/static/css/components.css">
+    <link rel="stylesheet" href="/static/css/pages.css">
+</head>
+<body>
+    <div id="app">
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="sidebar-toggle" onclick="document.getElementById('app').classList.toggle('sidebar-collapsed')">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+                </button>
+                <h1 class="app-title">Content Engine</h1>
+            </div>
+            <div class="topbar-right">
+                <div id="ai-indicator" class="ai-indicator hidden">
+                    <div class="spinner"></div>
+                    <span>AI working...</span>
+                </div>
+            </div>
+        </header>
+        <aside class="sidebar" id="sidebar">
+            <nav class="sidebar-nav" id="sidebar-nav"></nav>
+            <div class="sidebar-stats" id="sidebar-stats"></div>
+        </aside>
+        <main class="main-content" id="main-content"></main>
+    </div>
+
+    <div id="modal-root"></div>
+    <div id="toast-container"></div>
+
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/components/toast.js"></script>
+    <script src="/static/js/components/modal.js"></script>
+    <script src="/static/js/components/sidebar.js"></script>
+    <script src="/static/js/components/editable-cell.js"></script>
+    <script src="/static/js/components/file-upload.js"></script>
+    <script src="/static/js/components/tag-selector.js"></script>
+    <script src="/static/js/pages/dashboard.js"></script>
+    <script src="/static/js/pages/events.js"></script>
+    <script src="/static/js/pages/event-detail.js"></script>
+    <script src="/static/js/pages/brand-voices.js"></script>
+    <script src="/static/js/pages/content-table.js"></script>
+    <script src="/static/js/pages/export.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

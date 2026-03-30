@@ -2,14 +2,19 @@ import json
 from flask import Blueprint, request, jsonify
 from database import get_db
 from services.ai_service import extract_brief, suggest_platforms, generate_ideas, write_content, recommend_ads
+from app import limiter
 
 ai_bp = Blueprint('ai', __name__)
+
+# 20 AI calls per hour per IP — protects Anthropic API spend
+_AI_LIMIT = "20 per hour"
 
 @ai_bp.errorhandler(Exception)
 def handle_ai_error(e):
     return jsonify({"error": str(e)}), 500
 
 @ai_bp.route('/api/ai/extract-brief', methods=['POST'])
+@limiter.limit(_AI_LIMIT)
 def api_extract_brief():
     data = request.json
     event_id = data.get('event_id')
@@ -25,7 +30,7 @@ def api_extract_brief():
     db = get_db()
     db.execute("""UPDATE events SET name = COALESCE(?, name), description = ?,
         target_audience = ?, theme = ?, goals = ?, dates = ?, location = ?,
-        additional_info = ?, updated_at = datetime('now') WHERE id = ?""",
+        additional_info = ?, updated_at = NOW() WHERE id = ?""",
         (result.get('name'), result.get('description'), result.get('target_audience'),
          result.get('theme'), json.dumps(result.get('goals', [])),
          json.dumps(result.get('dates', {})), result.get('location'),
@@ -36,6 +41,7 @@ def api_extract_brief():
     return jsonify({"extracted": result, "event": dict(event)})
 
 @ai_bp.route('/api/ai/suggest-platforms', methods=['POST'])
+@limiter.limit(_AI_LIMIT)
 def api_suggest_platforms():
     data = request.json
     event_id = data.get('event_id')
@@ -57,6 +63,7 @@ def api_suggest_platforms():
     return jsonify([dict(p) for p in platforms])
 
 @ai_bp.route('/api/ai/generate-ideas', methods=['POST'])
+@limiter.limit(_AI_LIMIT)
 def api_generate_ideas():
     data = request.json
     event_id = data.get('event_id')
@@ -97,6 +104,7 @@ def api_generate_ideas():
     return jsonify({"ideas": ideas})
 
 @ai_bp.route('/api/ai/write-content', methods=['POST'])
+@limiter.limit(_AI_LIMIT)
 def api_write_content():
     data = request.json
     content_id = data.get('content_id')
@@ -117,7 +125,7 @@ def api_write_content():
     # Update content piece
     db = get_db()
     db.execute("""UPDATE content_pieces SET copywriting = ?, video_script = ?, caption = ?,
-        updated_at = datetime('now') WHERE id = ?""",
+        updated_at = NOW() WHERE id = ?""",
         (result.get('copywriting'), result.get('video_script'), result.get('caption'), content_id))
     db.commit()
     updated = db.execute("SELECT * FROM content_pieces WHERE id = ?", (content_id,)).fetchone()
@@ -125,6 +133,7 @@ def api_write_content():
     return jsonify(dict(updated))
 
 @ai_bp.route('/api/ai/recommend-ads', methods=['POST'])
+@limiter.limit(_AI_LIMIT)
 def api_recommend_ads():
     data = request.json
     event_id = data.get('event_id')
@@ -148,7 +157,7 @@ def api_recommend_ads():
     for rec in recs:
         if rec.get('should_promote') and rec.get('content_id'):
             db.execute("""UPDATE content_pieces SET is_ad = 1, ad_platform = ?, ad_reasoning = ?,
-                ad_budget = ?, updated_at = datetime('now') WHERE id = ?""",
+                ad_budget = ?, updated_at = NOW() WHERE id = ?""",
                 (rec.get('ad_platform'), rec.get('reasoning'),
                  rec.get('suggested_budget'), rec['content_id']))
     db.commit()

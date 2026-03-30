@@ -1,33 +1,53 @@
-from flask import Flask, send_from_directory
+from flask import Flask, render_template, jsonify
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 import config
 from database import init_db
 from seed_data import seed_brand_voices
 
-app = Flask(__name__, static_folder='static', template_folder='templates')
-app.config['MAX_CONTENT_LENGTH'] = config.MAX_UPLOAD_SIZE
+# Global limiter — imported by route modules that need per-route limits
+limiter = Limiter(
+    key_func=get_remote_address,
+    default_limits=["500 per hour"],
+    storage_uri="memory://",
+)
 
-# Initialize database and seed data
-init_db()
-seed_brand_voices()
 
-# Register route blueprints
-from routes.events import events_bp
-from routes.campaigns import campaigns_bp
-from routes.content import content_bp
-from routes.brand_voices import brand_voices_bp
-from routes.ai import ai_bp
-from routes.export import export_bp
+def create_app():
+    app = Flask(__name__, static_folder='static', template_folder='templates')
+    app.config['MAX_CONTENT_LENGTH'] = config.MAX_UPLOAD_SIZE
 
-app.register_blueprint(events_bp)
-app.register_blueprint(campaigns_bp)
-app.register_blueprint(content_bp)
-app.register_blueprint(brand_voices_bp)
-app.register_blueprint(ai_bp)
-app.register_blueprint(export_bp)
+    limiter.init_app(app)
 
-@app.route('/')
-def index():
-    return send_from_directory('templates', 'index.html')
+    config.init_directories()
+    init_db()
+    seed_brand_voices()
+
+    from routes.events import events_bp
+    from routes.campaigns import campaigns_bp
+    from routes.content import content_bp
+    from routes.brand_voices import brand_voices_bp
+    from routes.ai import ai_bp
+    from routes.export import export_bp
+
+    for bp in (events_bp, campaigns_bp, content_bp, brand_voices_bp, ai_bp, export_bp):
+        app.register_blueprint(bp)
+
+    @app.errorhandler(429)
+    def rate_limit_handler(e):
+        return jsonify({
+            "error": "Rate limit exceeded. Please slow down.",
+            "retry_after": e.description
+        }), 429
+
+    @app.route('/')
+    def index():
+        return render_template('index.html')
+
+    return app
+
+
+app = create_app()
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

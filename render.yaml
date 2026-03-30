@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: internal-event-builder
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false          # set manually in Render dashboard
+      - key: ANTHROPIC_MODEL
+        value: claude-sonnet-4-20250514
+      - key: DATABASE_URL
+        sync: false          # paste your Supabase connection string here

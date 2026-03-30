@@ -3,6 +3,7 @@ import json
 from flask import Blueprint, request, jsonify
 from database import get_db
 import config
+from app import limiter
 
 events_bp = Blueprint('events', __name__)
 
@@ -83,7 +84,7 @@ def update_event(event_id):
             values.append(json.dumps(data[key]) if not isinstance(data[key], str) else data[key])
     if not fields:
         return jsonify({"error": "No fields to update"}), 400
-    fields.append("updated_at = datetime('now')")
+    fields.append("updated_at = NOW()")
     values.append(event_id)
     db.execute(f"UPDATE events SET {', '.join(fields)} WHERE id = ?", values)
     db.commit()
@@ -100,6 +101,7 @@ def delete_event(event_id):
     return jsonify({"success": True})
 
 @events_bp.route('/api/events/upload', methods=['POST'])
+@limiter.limit("30 per hour")
 def upload_brief():
     if 'file' not in request.files:
         return jsonify({"error": "No file provided"}), 400

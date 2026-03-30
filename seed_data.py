@@ -46,7 +46,7 @@ PREDEFINED_VOICES = [
 
 def seed_brand_voices():
     db = get_db()
-    existing = db.execute("SELECT COUNT(*) FROM brand_voices WHERE is_predefined = 1").fetchone()[0]
+    existing = db.execute("SELECT COUNT(*) as count FROM brand_voices WHERE is_predefined = 1").fetchone()['count']
     if existing > 0:
         db.close()
         return

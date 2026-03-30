@@ -44,7 +44,7 @@ def update_content(content_id):
             fields.append(f"{key} = ?")
             values.append(data[key])
     if fields:
-        fields.append("updated_at = datetime('now')")
+        fields.append("updated_at = NOW()")
         values.append(content_id)
         db.execute(f"UPDATE content_pieces SET {', '.join(fields)} WHERE id = ?", values)
         db.commit()
@@ -66,9 +66,14 @@ def delete_content(content_id):
 
 @content_bp.route('/api/content/reorder', methods=['PUT'])
 def reorder_content():
-    data = request.json  # list of {id, sort_order}
+    data = request.json
+    if not isinstance(data, list):
+        return jsonify({"error": "Expected a list"}), 400
     db = get_db()
     for item in data:
+        if not isinstance(item.get('id'), int) or not isinstance(item.get('sort_order'), int):
+            db.close()
+            return jsonify({"error": "Each item must have integer id and sort_order"}), 400
         db.execute("UPDATE content_pieces SET sort_order = ? WHERE id = ?",
                    (item['sort_order'], item['id']))
     db.commit()

@@ -43,7 +43,7 @@ def update_voice(voice_id):
             fields.append(f"{key} = ?")
             values.append(json.dumps(data[key]) if isinstance(data[key], list) else data[key])
     if fields:
-        fields.append("updated_at = datetime('now')")
+        fields.append("updated_at = NOW()")
         values.append(voice_id)
         db.execute(f"UPDATE brand_voices SET {', '.join(fields)} WHERE id = ?", values)
         db.commit()

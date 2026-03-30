@@ -37,7 +37,7 @@ def update_campaign(campaign_id):
             fields.append(f"{key} = ?")
             values.append(data[key])
     if fields:
-        fields.append("updated_at = datetime('now')")
+        fields.append("updated_at = NOW()")
         values.append(campaign_id)
         db.execute(f"UPDATE campaigns SET {', '.join(fields)} WHERE id = ?", values)
         db.commit()

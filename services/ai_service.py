@@ -7,7 +7,10 @@ def _get_client():
 
 def _call_claude(system_prompt, user_message):
     if not config.ANTHROPIC_API_KEY:
-        raise ValueError("ANTHROPIC_API_KEY is not set. Create a .env file with: ANTHROPIC_API_KEY=sk-ant-...")
+        raise ValueError(
+            "ANTHROPIC_API_KEY is not set. "
+            "Set it as an environment variable or add it to a local .env file (see .env.example)."
+        )
     client = _get_client()
     response = client.messages.create(
         model=config.ANTHROPIC_MODEL,
@@ -16,6 +19,19 @@ def _call_claude(system_prompt, user_message):
         messages=[{"role": "user", "content": user_message}]
     )
     return response.content[0].text
+
+
+def _parse_json_response(text, fallback=None):
+    """Strip markdown code fences from a Claude response and parse JSON."""
+    text = text.strip()
+    if text.startswith("```"):
+        text = text.split("\n", 1)[1] if "\n" in text else text[3:]
+        if text.endswith("```"):
+            text = text[:-3]
+    try:
+        return json.loads(text.strip())
+    except json.JSONDecodeError:
+        return fallback
 
 def extract_brief(raw_text):
     system = """You are a marketing analyst. Extract structured event marketing information from the provided document text.
@@ -33,16 +49,7 @@ Return ONLY valid JSON with these fields:
 Fill in what you can extract. Use null for fields you cannot determine."""
 
     result = _call_claude(system, f"Extract marketing brief from this document:\n\n{raw_text[:8000]}")
-    try:
-        # Strip markdown code fences if present
-        text = result.strip()
-        if text.startswith("```"):
-            text = text.split("\n", 1)[1] if "\n" in text else text[3:]
-            if text.endswith("```"):
-                text = text[:-3]
-        return json.loads(text.strip())
-    except json.JSONDecodeError:
-        return {"name": "Untitled Event", "description": result[:500]}
+    return _parse_json_response(result, fallback={"name": "Untitled Event", "description": result[:500]})
 
 def suggest_platforms(event_data):
     system = """You are a digital marketing strategist. Based on the event details, suggest the most effective marketing platforms.
@@ -60,15 +67,7 @@ Goals: {event_data.get('goals')}
 Location: {event_data.get('location')}"""
 
     result = _call_claude(system, event_summary)
-    try:
-        text = result.strip()
-        if text.startswith("```"):
-            text = text.split("\n", 1)[1] if "\n" in text else text[3:]
-            if text.endswith("```"):
-                text = text[:-3]
-        return json.loads(text.strip())
-    except json.JSONDecodeError:
-        return []
+    return _parse_json_response(result, fallback=[])
 
 def generate_ideas(event_data, brand_voice, platforms):
     system = f"""You are a creative content strategist. Generate content ideas for event marketing.
@@ -96,15 +95,7 @@ Platforms: {platform_list}
 Generate creative, timely content ideas that align with the brand voice and target audience."""
 
     result = _call_claude(system, user_msg)
-    try:
-        text = result.strip()
-        if text.startswith("```"):
-            text = text.split("\n", 1)[1] if "\n" in text else text[3:]
-            if text.endswith("```"):
-                text = text[:-3]
-        return json.loads(text.strip())
-    except json.JSONDecodeError:
-        return []
+    return _parse_json_response(result, fallback=[])
 
 def write_content(content_piece, event_data, brand_voice):
     system = f"""You are a marketing copywriter. Write content for the given content piece.
@@ -127,15 +118,10 @@ Event: {event_data.get('name')} - {event_data.get('description')}
 Audience: {event_data.get('target_audience')}"""
 
     result = _call_claude(system, user_msg)
-    try:
-        text = result.strip()
-        if text.startswith("```"):
-            text = text.split("\n", 1)[1] if "\n" in text else text[3:]
-            if text.endswith("```"):
-                text = text[:-3]
-        return json.loads(text.strip())
-    except json.JSONDecodeError:
-        return {"copywriting": result[:1000], "video_script": None, "caption": ""}
+    return _parse_json_response(
+        result,
+        fallback={"copywriting": result[:1000], "video_script": None, "caption": ""}
+    )
 
 def recommend_ads(content_pieces, event_data):
     system = """You are a paid media strategist. Analyze the content pieces and recommend which should be promoted as paid ads.
@@ -164,12 +150,4 @@ Content pieces to analyze:
 {pieces_summary}"""
 
     result = _call_claude(system, user_msg)
-    try:
-        text = result.strip()
-        if text.startswith("```"):
-            text = text.split("\n", 1)[1] if "\n" in text else text[3:]
-            if text.endswith("```"):
-                text = text[:-3]
-        return json.loads(text.strip())
-    except json.JSONDecodeError:
-        return []
+    return _parse_json_response(result, fallback=[])

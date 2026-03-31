@@ -7,8 +7,32 @@ const EventDetailPage = {
         try {
             this.currentEvent = await API.getEvent(eventId);
             this.renderPage(container);
+            // Auto-extract if PDF was uploaded but brief hasn't been extracted yet
+            if (this.currentEvent.raw_text && !this.currentEvent.description) {
+                this._autoExtract();
+            }
         } catch (err) {
             container.innerHTML = `<div class="empty-state"><p>Event not found</p><p class="empty-state-hint">${esc(err.message)}</p></div>`;
+        }
+    },
+
+    async _autoExtract() {
+        const indicator = document.getElementById('ai-indicator');
+        const btn = document.getElementById('btn-extract-ai');
+        if (btn) { btn.disabled = true; btn.textContent = 'Extracting...'; }
+        if (indicator) indicator.classList.remove('hidden');
+        try {
+            const result = await API.extractBrief(this.currentEvent.id);
+            this.currentEvent = result.event;
+            const el = document.getElementById('tab-content');
+            if (el && this.currentTab === 'brief') this.renderBriefTab(el);
+            Toast.show('Brief extracted from uploaded document', 'success');
+        } catch (err) {
+            // Don't show error toast on auto-extract — user can click manually
+            const btn2 = document.getElementById('btn-extract-ai');
+            if (btn2) { btn2.disabled = false; btn2.textContent = 'Extract with AI'; }
+        } finally {
+            if (indicator) indicator.classList.add('hidden');
         }
     },
 

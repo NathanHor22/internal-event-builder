@@ -7,14 +7,22 @@ def _get_client_with_key(api_key=None):
     return anthropic.Anthropic(api_key=key)
 
 def _call_claude(system_prompt, user_message):
-    if not config.ANTHROPIC_API_KEY:
+    try:
+        from flask import g
+        api_key = getattr(g, 'api_key', None) or config.ANTHROPIC_API_KEY
+        model = getattr(g, 'model', None) or config.ANTHROPIC_MODEL
+    except RuntimeError:
+        # Outside application context (e.g. tests)
+        api_key = config.ANTHROPIC_API_KEY
+        model = config.ANTHROPIC_MODEL
+
+    if not api_key:
         raise ValueError(
-            "ANTHROPIC_API_KEY is not set. "
-            "Set it as an environment variable or add it to a local .env file (see .env.example)."
+            "No API key configured. Add your Anthropic API key via the Claude Accounts panel."
         )
-    client = _get_client_with_key()
+    client = _get_client_with_key(api_key)
     response = client.messages.create(
-        model=config.ANTHROPIC_MODEL,
+        model=model,
         max_tokens=4096,
         system=system_prompt,
         messages=[{"role": "user", "content": user_message}]

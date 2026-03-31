@@ -24,6 +24,10 @@
                     <div class="spinner"></div>
                     <span>AI working...</span>
                 </div>
+                <button class="api-key-btn" onclick="ApiKeyManager.openModal()">
+                    <span class="api-key-dot" id="api-key-dot"></span>
+                    <span id="api-key-label">Connect Claude</span>
+                </button>
             </div>
         </header>
         <aside class="sidebar" id="sidebar">
@@ -39,6 +43,7 @@
     <script src="/static/js/api.js"></script>
     <script src="/static/js/components/toast.js"></script>
     <script src="/static/js/components/modal.js"></script>
+    <script src="/static/js/components/api-key-manager.js"></script>
     <script src="/static/js/components/sidebar.js"></script>
     <script src="/static/js/components/editable-cell.js"></script>
     <script src="/static/js/components/file-upload.js"></script>

@@ -7,6 +7,14 @@ const API = {
         } else if (body instanceof FormData) {
             opts.body = body;
         }
+        // Attach user-configured API key and model if available
+        if (typeof ApiKeyManager !== 'undefined') {
+            const active = ApiKeyManager.getActive();
+            if (active) {
+                opts.headers['X-Api-Key'] = active.key;
+                opts.headers['X-Api-Model'] = active.model;
+            }
+        }
         const res = await fetch(path, opts);
         if (!res.ok) {
             const err = await res.json().catch(() => ({ error: res.statusText }));

@@ -1,17 +1,9 @@
 import os
 from flask import Flask, render_template, jsonify
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 import config
 from database import init_db
 from seed_data import seed_brand_voices
-
-# Global limiter — imported by route modules that need per-route limits
-limiter = Limiter(
-    key_func=get_remote_address,
-    default_limits=["500 per hour"],
-    storage_uri="memory://",
-)
+from extensions import limiter
 
 
 def create_app():

@@ -1,17 +1,54 @@
 import json
-from flask import Blueprint, request, jsonify
+import anthropic
+from flask import Blueprint, request, jsonify, g
 from database import get_db
 from services.ai_service import extract_brief, suggest_platforms, generate_ideas, write_content, recommend_ads
-from app import limiter
+import config
+from extensions import limiter
 
 ai_bp = Blueprint('ai', __name__)
 
 # 20 AI calls per hour per IP — protects Anthropic API spend
 _AI_LIMIT = "20 per hour"
 
+ALLOWED_MODELS = {
+    'claude-opus-4-6',
+    'claude-sonnet-4-6',
+    'claude-haiku-4-5-20251001',
+}
+
+@ai_bp.before_request
+def set_api_credentials():
+    """Promote user-supplied API key and model from headers into flask.g."""
+    user_key = request.headers.get('X-Api-Key', '').strip()
+    user_model = request.headers.get('X-Api-Model', '').strip()
+    g.api_key = user_key if user_key else None
+    g.model = user_model if user_model in ALLOWED_MODELS else None
+
 @ai_bp.errorhandler(Exception)
 def handle_ai_error(e):
     return jsonify({"error": "An internal error occurred. Please try again."}), 500
+
+
+@ai_bp.route('/api/ai/verify-key', methods=['POST'])
+@limiter.limit("10 per hour")
+def verify_key():
+    data = request.json or {}
+    api_key = data.get('api_key', '').strip()
+    if not api_key:
+        return jsonify({"error": "api_key required"}), 400
+    try:
+        client = anthropic.Anthropic(api_key=api_key)
+        client.messages.create(
+            model='claude-haiku-4-5-20251001',
+            max_tokens=5,
+            messages=[{"role": "user", "content": "Hi"}]
+        )
+        return jsonify({"valid": True})
+    except anthropic.AuthenticationError:
+        return jsonify({"valid": False, "error": "Invalid API key"}), 401
+    except Exception:
+        return jsonify({"valid": False, "error": "Could not connect to Anthropic API"}), 400
 
 @ai_bp.route('/api/ai/extract-brief', methods=['POST'])
 @limiter.limit(_AI_LIMIT)

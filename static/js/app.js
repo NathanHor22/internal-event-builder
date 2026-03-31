@@ -54,4 +54,5 @@ const Router = {
 document.addEventListener('DOMContentLoaded', () => {
     if (!location.hash) location.hash = '#/';
     Router.init();
+    ApiKeyManager._updateTopbar();
 });

@@ -11,7 +11,7 @@ _AI_LIMIT = "20 per hour"
 
 @ai_bp.errorhandler(Exception)
 def handle_ai_error(e):
-    return jsonify({"error": str(e)}), 500
+    return jsonify({"error": "An internal error occurred. Please try again."}), 500
 
 @ai_bp.route('/api/ai/extract-brief', methods=['POST'])
 @limiter.limit(_AI_LIMIT)

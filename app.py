@@ -1,3 +1,4 @@
+import os
 from flask import Flask, render_template, jsonify
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -50,4 +51,4 @@ def create_app():
 app = create_app()
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=os.environ.get('FLASK_DEBUG') == '1', port=5000)

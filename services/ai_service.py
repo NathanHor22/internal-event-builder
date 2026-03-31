@@ -2,8 +2,9 @@ import json
 import anthropic
 import config
 
-def _get_client():
-    return anthropic.Anthropic(api_key=config.ANTHROPIC_API_KEY)
+def _get_client_with_key(api_key=None):
+    key = api_key or config.ANTHROPIC_API_KEY
+    return anthropic.Anthropic(api_key=key)
 
 def _call_claude(system_prompt, user_message):
     if not config.ANTHROPIC_API_KEY:
@@ -11,7 +12,7 @@ def _call_claude(system_prompt, user_message):
             "ANTHROPIC_API_KEY is not set. "
             "Set it as an environment variable or add it to a local .env file (see .env.example)."
         )
-    client = _get_client()
+    client = _get_client_with_key()
     response = client.messages.create(
         model=config.ANTHROPIC_MODEL,
         max_tokens=4096,

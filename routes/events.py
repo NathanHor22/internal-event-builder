@@ -21,7 +21,10 @@ def list_events():
         ORDER BY e.created_at DESC
     """).fetchall()
     db.close()
-    return jsonify([dict(r) for r in rows])
+    result = [dict(r) for r in rows]
+    for r in result:
+        r.pop('raw_file_path', None)
+    return jsonify(result)
 
 @events_bp.route('/api/events', methods=['POST'])
 def create_event():
@@ -39,7 +42,9 @@ def create_event():
     event_id = cur.lastrowid
     event = db.execute("SELECT * FROM events WHERE id = ?", (event_id,)).fetchone()
     db.close()
-    return jsonify(dict(event)), 201
+    result = dict(event)
+    result.pop('raw_file_path', None)
+    return jsonify(result), 201
 
 @events_bp.route('/api/events/<int:event_id>', methods=['GET'])
 def get_event(event_id):
@@ -54,6 +59,7 @@ def get_event(event_id):
         db.close()
         return jsonify({"error": "Event not found"}), 404
     result = dict(event)
+    result.pop('raw_file_path', None)
     # Get platforms
     platforms = db.execute("SELECT * FROM event_platforms WHERE event_id = ?", (event_id,)).fetchall()
     result['platforms'] = [dict(p) for p in platforms]
@@ -90,7 +96,9 @@ def update_event(event_id):
     db.commit()
     event = db.execute("SELECT * FROM events WHERE id = ?", (event_id,)).fetchone()
     db.close()
-    return jsonify(dict(event))
+    result = dict(event)
+    result.pop('raw_file_path', None)
+    return jsonify(result)
 
 @events_bp.route('/api/events/<int:event_id>', methods=['DELETE'])
 def delete_event(event_id):
@@ -133,7 +141,9 @@ def upload_brief():
     event_id = cur.lastrowid
     event = db.execute("SELECT * FROM events WHERE id = ?", (event_id,)).fetchone()
     db.close()
-    return jsonify(dict(event)), 201
+    result = dict(event)
+    result.pop('raw_file_path', None)
+    return jsonify(result), 201
 
 @events_bp.route('/api/events/<int:event_id>/platforms', methods=['GET'])
 def get_platforms(event_id):

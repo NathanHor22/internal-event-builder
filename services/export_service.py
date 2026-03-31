@@ -1,4 +1,5 @@
 import csv
+import glob
 import io
 import os
 import json
@@ -108,6 +109,12 @@ def export_excel(event_id):
     for col in range(1, 16):
         ws.column_dimensions[ws.cell(row=1, column=col).column_letter].width = 18
 
+    for old in glob.glob(os.path.join(config.EXPORT_DIR, f"event_{event_id}_*.xlsx")):
+        try:
+            os.remove(old)
+        except OSError:
+            pass
+
     filepath = os.path.join(config.EXPORT_DIR, f"event_{event_id}_{datetime.now().strftime('%Y%m%d%H%M%S')}.xlsx")
     wb.save(filepath)
     return filepath
@@ -123,6 +130,12 @@ def export_pdf(event_id):
     if not result[0]:
         return None
     event, campaigns, pieces, platforms = result
+
+    for old in glob.glob(os.path.join(config.EXPORT_DIR, f"event_{event_id}_*.pdf")):
+        try:
+            os.remove(old)
+        except OSError:
+            pass
 
     filepath = os.path.join(config.EXPORT_DIR, f"event_{event_id}_{datetime.now().strftime('%Y%m%d%H%M%S')}.pdf")
     doc = SimpleDocTemplate(filepath, pagesize=landscape(A4), topMargin=0.5*inch, bottomMargin=0.5*inch)

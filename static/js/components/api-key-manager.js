@@ -254,26 +254,26 @@ _akStyle.textContent = `
     padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-md);
     margin-bottom: 8px; background: var(--bg-tertiary); gap: 12px;
 }
-.api-key-row.active { border-color: var(--accent); background: var(--accent-dim); }
+.api-key-row.active { border-color: #cc785c; background: rgba(204,120,92,0.1); }
 .api-key-row-info { flex: 1; min-width: 0; }
 .api-key-row-name { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
 .api-key-row-meta { display: flex; align-items: center; gap: 8px; }
 .api-key-masked { font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); }
 .api-key-row-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-.api-key-active-label { font-size: 11px; font-weight: 600; color: var(--accent); }
-.api-key-active-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex-shrink: 0; display: inline-block; }
+.api-key-active-label { font-size: 11px; font-weight: 600; color: #cc785c; }
+.api-key-active-dot { width: 7px; height: 7px; border-radius: 50%; background: #cc785c; flex-shrink: 0; display: inline-block; }
 
 .api-key-btn {
     display: flex; align-items: center; gap: 7px; padding: 5px 12px;
-    border: 1px solid var(--border); border-radius: var(--radius-sm);
-    font-size: 12px; font-weight: 500; color: var(--text-secondary);
-    background: var(--bg-tertiary); cursor: pointer; transition: all var(--transition);
+    border: 1px solid #3d3d3d; border-radius: var(--radius-sm);
+    font-size: 12px; font-weight: 500; color: #a8a8a8;
+    background: #2a2a2a; cursor: pointer; transition: all var(--transition);
 }
-.api-key-btn:hover { border-color: var(--border-light); color: var(--text-primary); }
+.api-key-btn:hover { border-color: #cc785c; color: #e8d5cc; background: #2f2522; }
 .api-key-dot {
-    width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted);
-    flex-shrink: 0; transition: background var(--transition);
+    width: 8px; height: 8px; border-radius: 50%; background: #555;
+    flex-shrink: 0; transition: all var(--transition);
 }
-.api-key-dot.connected { background: var(--success); box-shadow: 0 0 0 2px var(--success-dim); }
+.api-key-dot.connected { background: #cc785c; box-shadow: 0 0 0 2px rgba(204,120,92,0.25); }
 `;
 document.head.appendChild(_akStyle);

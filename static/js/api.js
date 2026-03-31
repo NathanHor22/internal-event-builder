@@ -73,4 +73,8 @@ const API = {
     exportCSV: (eventId) => `/api/export/${eventId}/csv`,
     exportExcel: (eventId) => `/api/export/${eventId}/excel`,
     exportPDF: (eventId) => `/api/export/${eventId}/pdf`,
+
+    // Slides
+    generateSlides: (wizardAnswers) => API.post('/api/slides/generate', wizardAnswers),
+    slidesDownloadUrl: (filename) => `/api/slides/download/${encodeURIComponent(filename)}`,
 };

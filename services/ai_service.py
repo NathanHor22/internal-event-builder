@@ -25,7 +25,8 @@ def _call_claude(system_prompt, user_message):
         model=model,
         max_tokens=4096,
         system=system_prompt,
-        messages=[{"role": "user", "content": user_message}]
+        messages=[{"role": "user", "content": user_message}],
+        timeout=90.0,
     )
     return response.content[0].text
 

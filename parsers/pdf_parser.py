@@ -8,5 +8,5 @@ def parse_pdf(filepath):
                 if page_text:
                     text_parts.append(page_text)
         return "\n\n".join(text_parts)
-    except Exception as e:
-        return f"[Error parsing PDF: {str(e)}]"
+    except Exception:
+        return ""

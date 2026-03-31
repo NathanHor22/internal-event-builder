@@ -24,5 +24,5 @@ def parse_pptx(filepath):
                 if notes:
                     text_parts.append(f"[Speaker Notes] {notes}")
         return "\n\n".join(text_parts)
-    except Exception as e:
-        return f"[Error parsing PPTX: {str(e)}]"
+    except Exception:
+        return ""

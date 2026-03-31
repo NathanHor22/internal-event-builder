@@ -13,6 +13,7 @@ const Router = {
         '#/events': EventsPage,
         '#/brand-voices': BrandVoicesPage,
         '#/export': ExportPage,
+        '#/slides': SlidesPage,
     },
 
     init() {

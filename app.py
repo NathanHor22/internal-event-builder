@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, request
 import config
 from database import init_db
 from seed_data import seed_brand_voices
@@ -22,9 +22,22 @@ def create_app():
     from routes.brand_voices import brand_voices_bp
     from routes.ai import ai_bp
     from routes.export import export_bp
+    from routes.slides import slides_bp
 
-    for bp in (events_bp, campaigns_bp, content_bp, brand_voices_bp, ai_bp, export_bp):
+    for bp in (events_bp, campaigns_bp, content_bp, brand_voices_bp, ai_bp, export_bp, slides_bp):
         app.register_blueprint(bp)
+
+    @app.after_request
+    def set_security_headers(response):
+        response.headers['X-Content-Type-Options'] = 'nosniff'
+        response.headers['X-Frame-Options'] = 'DENY'
+        response.headers['X-XSS-Protection'] = '1; mode=block'
+        response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+        response.headers['Permissions-Policy'] = 'geolocation=(), microphone=(), camera=()'
+        # Only set HSTS when actually on HTTPS
+        if request.is_secure:
+            response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+        return response
 
     @app.errorhandler(429)
     def rate_limit_handler(e):
